@@ -15,6 +15,10 @@ down:
 
 build:
 	docker-compose build
+start:
+	docker-compose start
+stop:
+	docker-compose stop
 
 # next.js
 dev:

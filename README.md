@@ -1,5 +1,7 @@
 # Next.js×Laravelで開発する簡易アプリケーションのハンズオン
 
+https://yutaro-blog.net/2022/01/28/typescript-nextjs-laravel-hands-on-1/
+
 ## 前提
 
 - M1Macにも対応しています！

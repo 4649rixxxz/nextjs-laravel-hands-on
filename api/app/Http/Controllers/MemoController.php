@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MemoPostRequest;
+use App\Http\Resources\MemoResource;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Memo;
 
 class MemoController extends Controller
 {
@@ -14,7 +18,17 @@ class MemoController extends Controller
      */
     public function fetch(): AnonymousResourceCollection
     {
-        // 処理
+        $id = Auth::id();
+        if (!$id) {
+            throw new Exception('未ログインです。');
+        }
+
+        try {
+            $memos = Memo::where('user_id', $id)->get();
+            return MemoResource::collection($memos);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     /**
@@ -24,6 +38,22 @@ class MemoController extends Controller
      */
     public function create(MemoPostRequest $request): JsonResponse
     {
-        // 処理
+        try {
+            // モデルクラスのインスタンス化
+            $memo = new Memo();
+            // パラメータのセット
+            $memo->user_id = Auth::id();
+            $memo->title = $request->title;
+            $memo->body = $request->body;
+            // モデルの保存
+            $memo->save();
+
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        return response()->json([
+            'message' => 'メモの登録に成功しました。'
+        ], 201);
     }
 }
