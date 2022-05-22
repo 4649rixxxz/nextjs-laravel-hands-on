@@ -2,6 +2,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import { useUserState } from '../../atoms/userAtom';
 import { axiosApi } from '../../lib/axios';
 
 type Memo = {
@@ -13,13 +14,20 @@ const Memo: NextPage = () => {
   const router = useRouter();
   const [memos, setMemos] = useState<Memo[]>([]);
 
+  const { user } = useUserState();
+
   useEffect(() => {
+    if (!user) {
+      router.push('/');
+      return;
+    }
     axiosApi.get('/api/memos')
       .then((response: AxiosResponse) => {
         setMemos(response.data.data);
       })
       .catch((err: AxiosError) => console.log(err.response));
-  }, []);
+      // []にしたいが、[]の場合ESLintのwarningが発生する
+  }, [user, router]);
 
   return (
     <div className='w-2/3 mx-auto mt-32'>

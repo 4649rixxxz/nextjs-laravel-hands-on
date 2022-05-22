@@ -4,6 +4,7 @@ import { useState, ChangeEvent } from 'react';
 import { RequiredMark } from '../components/RequiredMark';
 import { axiosApi } from '../lib/axios';
 import { useRouter } from 'next/router';
+import { useUserState } from '../atoms/userAtom';
 
 type LoginForm = {
   email: string;
@@ -30,6 +31,8 @@ const Home: NextPage = () => {
     setLoginForm({...loginForm, [e.target.name]: e.target.value});
   }
 
+  const { setUser } = useUserState();
+
   // ログイン
   const login = () => {
     // バリデーションメッセージの初期化
@@ -37,6 +40,7 @@ const Home: NextPage = () => {
     axiosApi.get('/sanctum/csrf-cookie').then((res) => {
       axiosApi.post('/login', loginForm).then((response: AxiosResponse) => {
         console.log(response.data);
+        setUser(response.data.data);
         router.push('/memos');
       }).catch((err: AxiosError) => {
         const status = err.response?.status;

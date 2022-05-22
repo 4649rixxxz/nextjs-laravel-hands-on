@@ -21,9 +21,11 @@ stop:
 	docker-compose stop
 
 # next.js
+.PHONY: front
+front:
+	docker compose exec front sh
 dev:
 	docker-compose exec front yarn dev
-
 axios:
 	docker-compose exec front yarn add axios
 
