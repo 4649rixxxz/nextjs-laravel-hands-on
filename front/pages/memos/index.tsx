@@ -2,7 +2,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { useUserState } from '../../atoms/userAtom';
+import { useAuth } from '../../hooks/useAuth';
 import { axiosApi } from '../../lib/axios';
 
 type Memo = {
@@ -13,21 +13,26 @@ type Memo = {
 const Memo: NextPage = () => {
   const router = useRouter();
   const [memos, setMemos] = useState<Memo[]>([]);
-
-  const { user } = useUserState();
+  const { checkLoggedIn } = useAuth();
 
   useEffect(() => {
-    if (!user) {
-      router.push('/');
-      return;
-    }
-    axiosApi.get('/api/memos')
-      .then((response: AxiosResponse) => {
-        setMemos(response.data.data);
-      })
-      .catch((err: AxiosError) => console.log(err.response));
-      // []にしたいが、[]の場合ESLintのwarningが発生する
-  }, [user, router]);
+    const init = async () => {
+      const res:boolean = await checkLoggedIn();
+      if (!res) {
+        router.push('/');
+        return;
+      }
+      axiosApi
+        .get('/api/memos')
+        .then((response: AxiosResponse) => {
+          console.log(response.data);
+          setMemos(response.data.data);
+        })
+        .catch((err: AxiosError) => console.log(err.response));
+    };
+
+    init();
+  }, []);
 
   return (
     <div className='w-2/3 mx-auto mt-32'>

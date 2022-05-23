@@ -2,8 +2,8 @@ import { AxiosError, AxiosResponse } from 'axios';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ChangeEvent, useState, useEffect } from 'react';
-import { useUserState } from '../../atoms/userAtom';
 import { RequiredMark } from '../../components/RequiredMark';
+import { useAuth } from '../../hooks/useAuth';
 import { axiosApi } from '../../lib/axios';
 
 type MemoForm = {
@@ -19,17 +19,18 @@ type Validation = {
 const Post: NextPage = () => {
 
   const router = useRouter();
-
-  const { user } = useUserState();
+  const { checkLoggedIn } = useAuth();
 
   useEffect(() => {
-    // ログイン中か判定
-    if (!user) {
-      router.push('/');
-      return;
-    }
-    // []にしたいが、[]の場合ESLintのwarningが発生する
-  }, [user, router]);
+    const init = async () => {
+      // ログイン中かを判定
+      const res: boolean = await checkLoggedIn();
+      if (!res) {
+        router.push('/');
+      }
+    };
+    init();
+  }, []);
 
   const [memoForm, setMemoForm] = useState<MemoForm>({
     title: '',
